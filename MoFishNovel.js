@@ -11,18 +11,6 @@
 (function() {
     'use strict';
 
-    var csdn = document.getElementById('csdn-toolbar');
-    var input = document.createElement('input');
-    input.setAttribute('id','readFile');
-    input.setAttribute('type','file');
-    csdn.appendChild(input);
-
-    var content_views = document.getElementById('content_views');
-    var p = document.createElement('p');
-    p.setAttribute('id','novelText');
-    p.innerHTML="";
-    content_views.appendChild(p);
-
     var strArray=[];
     var currentPage=0;
 
@@ -41,22 +29,58 @@
         return array;
     };
 
-    document.getElementById('readFile').addEventListener('change',function selectedFileChanged(){
-        const reader=new FileReader();
-        reader.onload=function fileReadCompleted(){
-            strArray=fixedLengthFormatString(reader.result,100);
-        };
-        reader.readAsText(this.files[0]);
-    });
-
     document.onkeydown = function(event) {
         var e = event || window.event || arguments.callee.caller.arguments[0];
         var novelText = document.getElementById('novelText');
+        if (e && e.keyCode == 17) { // 按Ctrl键
+            // 防止出现多个组件
+            if(document.getElementById("readFile")!==null){
+                return;
+            }
+
+            var csdn = document.getElementById("csdn-toolbar");
+            var input = document.createElement('input');
+            input.setAttribute('id','readFile');
+            input.setAttribute('type','file');
+            csdn.appendChild(input);
+
+            var content_views = document.getElementById('content_views');
+            var centerNum=content_views.childNodes.length/2;
+            var center=content_views.childNodes[Math.floor(centerNum)];
+            var p = document.createElement('p');
+            p.setAttribute('id','novelText');
+            p.innerHTML="";
+            center.appendChild(p);
+
+            document.getElementById('readFile').addEventListener('change',function selectedFileChanged(){
+                const reader=new FileReader();
+                reader.onload=function fileReadCompleted(){
+                    strArray=fixedLengthFormatString(reader.result,100);
+                };
+                reader.readAsText(this.files[0]);
+            });
+        }
         if (e && e.keyCode == 37) { // 按左键
-            novelText.innerHTML=strArray[--currentPage];
+            if(currentPage>0){
+                novelText.innerHTML=strArray[--currentPage];
+            }
         }
         if (e && e.keyCode == 39) { // 按右键
-            novelText.innerHTML=strArray[++currentPage];
+            if(currentPage<strArray.length){
+                novelText.innerHTML=strArray[++currentPage];
+            }
+        }
+        if (e && e.keyCode == 107) { // 按+键
+            var page=prompt("页数：","");
+            if (page!=null && page!=""){
+                if(parseInt(page)<strArray.length){
+                    novelText.innerHTML=strArray[++page];
+                    currentPage=page;
+                }else{
+                    alert("请重新输入");
+                }
+            }
         }
     };
+
 })();
