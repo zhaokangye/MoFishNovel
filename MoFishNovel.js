@@ -33,7 +33,6 @@
         var e = event || window.event || arguments.callee.caller.arguments[0];
         var novelText = document.getElementById('novelText');
         if (e && e.keyCode == 17) { // 按Ctrl键
-            // 防止出现多个组件
             if(document.getElementById("readFile")!==null){
                 return;
             }
